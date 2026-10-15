@@ -13,7 +13,7 @@ no build step. It's hosted on GitHub Pages and talks only to the extension's Sup
 The page holds only the project URL and the publishable key (`config.js`). Both are public, and
 the source of the extension itself contains the same values.
 
-Every read and write goes through a database function (`supabase/migrations/20261015200000_admin_plans.sql`
+Every read and write goes through a database function (`supabase/migrations/20261015222837_admin_plans.sql`
 in the extension's repo). Each function refuses anyone who isn't in `public.admins`, so anyone
 else who signs in sees "No admin access".
 

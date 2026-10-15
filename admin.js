@@ -1,7 +1,7 @@
 // Topic Feeds admin panel: a static page (GitHub Pages) over the Supabase Auth and Data APIs, in
 // plain fetch like the extension's supa.js. Signing in uses Supabase's Google redirect; every
 // read and write is an admin_* function, which refuses anyone not in public.admins
-// (supabase/migrations/20261015200000_admin_plans.sql).
+// (supabase/migrations/20261015222837_admin_plans.sql).
 //
 // Routes (hash, since Pages can't rewrite paths):
 //   #/plans             Plans & access: the free plan's feed limit, and every user
