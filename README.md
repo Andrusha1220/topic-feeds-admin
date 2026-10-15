@@ -22,13 +22,15 @@ Never put a secret or `service_role` key in this folder.
 ## Signing in
 
 Sign-in is Google through Supabase (`/auth/v1/authorize?provider=google`). Supabase sends the
-browser back to the page with the session in the URL hash. The session is kept in
-`localStorage` and refreshed as needed.
+browser back to the page with the session in the URL hash. The session stays in memory and is
+refreshed as needed. Reloading the page means signing in again. Every Pages site of the account
+shares the `andrusha1220.github.io` origin, so browser storage would expose the admin's token to
+all of them.
 
 Do these once in the Supabase project and in Google Cloud:
 
-1. **Supabase**: Authentication › URL Configuration › Redirect URLs. Add the page's address,
-   `https://andrusha1220.github.io/topic-feeds-admin/`.
+1. **Supabase**: Authentication › URL Configuration › Redirect URLs. Add
+   `https://andrusha1220.github.io/topic-feeds-admin/**`.
 2. **Google Cloud**: Google Auth Platform › Clients. On the extension's **Web application**
    client, add `https://mwqlaecfjoucjhpgcptj.supabase.co/auth/v1/callback` under Authorized
    redirect URIs.

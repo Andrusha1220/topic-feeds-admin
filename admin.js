@@ -9,7 +9,6 @@
 
 import { SUPABASE_URL, SUPABASE_KEY } from './config.js';
 
-const SESSION_KEY = 'tf-admin-session';
 const EARLY_MS = 60 * 1000;
 
 const $ = (sel) => document.querySelector(sel);
@@ -54,14 +53,11 @@ function toast(text, kind = '') {
 
 // ---------- session ----------
 
-function loadSession() {
-  try { return JSON.parse(localStorage.getItem(SESSION_KEY)) ?? null; } catch { return null; }
-}
-function saveSession(s) {
-  try { s ? localStorage.setItem(SESSION_KEY, JSON.stringify(s)) : localStorage.removeItem(SESSION_KEY); } catch { /* private window */ }
-  session = s;
-}
-let session = loadSession();
+// In memory only: every Pages site of the account shares the origin andrusha1220.github.io, so
+// localStorage or sessionStorage would hand the admin's refresh token to any of them. A reload
+// means signing in again.
+let session = null;
+const saveSession = (s) => { session = s; };
 
 class ApiError extends Error {
   constructor(status, body) {
