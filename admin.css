@@ -156,7 +156,7 @@ main { padding: var(--x2) var(--x2) 80px; max-inline-size: 860px; inline-size: 1
 
 /* ---------- narrow ---------- */
 @media (max-width: 720px) {
-  .shell { grid-template-columns: 1fr; }
+  .shell { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
   .side {
     position: static; block-size: auto; flex-direction: row; flex-wrap: wrap; align-items: center;
     gap: var(--md) var(--lg); padding: var(--md) var(--lg); border-inline-end: 0; border-block-end: 1px solid var(--line);
@@ -171,3 +171,7 @@ main { padding: var(--x2) var(--x2) 80px; max-inline-size: 860px; inline-size: 1
   .facts { grid-template-columns: 1fr; gap: 0; }
   .facts dd { margin-block-end: var(--sm); }
 }
+
+/* ---------- users page ---------- */
+.card-head input[type="search"] { flex: 1; margin: 0; }
+.card-head:has(input) { align-items: center; margin-block-end: var(--sm); }

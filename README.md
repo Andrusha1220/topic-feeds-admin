@@ -3,10 +3,12 @@
 A static page for running Topic Feeds for Instagram. It's plain HTML, CSS and ES modules, with
 no build step. It's hosted on GitHub Pages and talks only to the extension's Supabase project.
 
-- **Plans & access** (`#/plans`): set how many feeds the free plan allows, and see the list of
-  everyone who has signed in to the extension with Google.
-- **One user** (`#/plans/users/<id>`): their account details, synced feed counts, any paid
-  subscription, and the **Give Plus** toggle.
+Two pages in the sidebar:
+
+- **Plans** (`#/plans`): set how many feeds the free plan allows.
+- **Users** (`#/users`): everyone who has signed in to the extension with Google, with search.
+  Each opens its own page (`#/users/<id>`) with the account details, synced feed counts, any
+  paid subscription and the **Give Plus** toggle.
 
 ## How it's protected
 

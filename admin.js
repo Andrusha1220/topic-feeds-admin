@@ -4,8 +4,9 @@
 // (supabase/migrations/20261015222837_admin_plans.sql).
 //
 // Routes (hash, since Pages can't rewrite paths):
-//   #/plans             Plans & access: the free plan's feed limit, and every user
-//   #/plans/users/<id>  one user, with the Plus toggle
+//   #/plans       Plans: the free plan's feed limit
+//   #/users       Users: everyone who has signed in
+//   #/users/<id>  one user, with the Plus toggle
 
 import { SUPABASE_URL, SUPABASE_KEY } from './config.js';
 
@@ -194,9 +195,9 @@ function plusSource(u) {
   return null;
 }
 
-// Plans & access: the free plan's limit, then every user.
+// Plans: the free plan's limit.
 async function plansView() {
-  const [settings, users] = await Promise.all([rpc('admin_settings'), rpc('admin_users')]);
+  const settings = await rpc('admin_settings');
 
   const limit = el('input', {
     type: 'number', id: 'limit', min: 1, max: 100, step: 1, required: true, value: settings.free_feed_limit, inputmode: 'numeric'
@@ -226,6 +227,19 @@ async function plansView() {
   el('div', { class: 'row' }, limit, save),
   limitNote);
 
+  return [
+    el('header', { class: 'page-head' },
+      el('h1', {}, 'Plans'),
+      el('p', { class: 'muted' }, 'What the free plan allows. Plus is given per person, under ', el('a', { href: '#/users' }, 'Users'), '.')),
+    el('section', { class: 'card' },
+      el('h2', {}, 'Free plan'),
+      el('p', { class: 'muted' }, 'Making a new feed past this number opens the Plus offer. Feeds people already have stay, even over the limit. Plus has no limit.'),
+      limitForm)];
+}
+
+// Users: everyone who has signed in, newest first.
+async function usersView() {
+  const users = await rpc('admin_users');
   const search = el('input', { type: 'search', placeholder: 'Search by email or name', 'aria-label': 'Search users' });
   const list = el('ul', { class: 'users' });
   const count = el('span', { class: 'muted' });
@@ -234,7 +248,7 @@ async function plansView() {
     const shown = users.filter((u) => !q || (u.email ?? '').toLowerCase().includes(q) || (u.name ?? '').toLowerCase().includes(q));
     count.textContent = q ? `${shown.length} of ${users.length}` : plural(users.length, 'user', 'users');
     list.replaceChildren(...shown.map((u) => el('li', {},
-      el('a', { href: `#/plans/users/${u.id}`, class: 'user-row' },
+      el('a', { href: `#/users/${u.id}`, class: 'user-row' },
         avatar(u),
         el('span', { class: 'who' },
           el('span', { class: 'name' }, u.name || u.email || u.id),
@@ -247,18 +261,13 @@ async function plansView() {
   search.addEventListener('input', paint);
   paint();
 
+  const plus = users.filter((u) => u.plus).length;
   return [
     el('header', { class: 'page-head' },
-      el('h1', {}, 'Plans & access'),
-      el('p', { class: 'muted' }, 'What the free plan allows, and who has Plus.')),
+      el('h1', {}, 'Users'),
+      el('p', { class: 'muted' }, `Everyone who has signed in to the extension with Google. ${plus} with Plus.`)),
     el('section', { class: 'card' },
-      el('h2', {}, 'Free plan'),
-      el('p', { class: 'muted' }, 'Making a new feed past this number opens the Plus offer. Feeds people already have stay, even over the limit. Plus has no limit.'),
-      limitForm),
-    el('section', { class: 'card' },
-      el('div', { class: 'card-head' }, el('h2', {}, 'Users'), count),
-      el('p', { class: 'muted' }, 'Everyone who has signed in to the extension with Google.'),
-      search,
+      el('div', { class: 'card-head' }, search, count),
       list)];
 }
 
@@ -268,7 +277,7 @@ function fact(label, ...value) {
 
 async function userView(id) {
   const [u] = await rpc('admin_users', { uid: id });
-  if (!u) return [el('a', { href: '#/plans', class: 'back' }, '← Plans & access'), el('p', {}, 'No such user.')];
+  if (!u) return [el('a', { href: '#/users', class: 'back' }, '← Users'), el('p', {}, 'No such user.')];
 
   const source = el('p', { class: 'muted small' });
   const status = el('span', {});
@@ -304,7 +313,7 @@ async function userView(id) {
   const paid = u.plan === 'plus' || u.paid_until || u.subscription_status;
 
   return [
-    el('a', { href: '#/plans', class: 'back' }, '← Plans & access'),
+    el('a', { href: '#/users', class: 'back' }, '← Users'),
     el('header', { class: 'page-head user-head' },
       avatar(u, 56),
       el('div', {},
@@ -346,14 +355,15 @@ let renderId = 0;
 async function render() {
   const id = ++renderId;
   if (!session) return signedOutView(render.error);
-  const route = location.hash.match(/^#\/plans\/users\/([0-9a-f-]{36})$/i);
-  if (!/^#\/plans(\/|$)/.test(location.hash)) { history.replaceState(null, '', '#/plans'); }
+  const route = location.hash.match(/^#\/(?:plans\/)?users\/([0-9a-f-]{36})$/i);
+  const section = route || /^#\/users\/?$/.test(location.hash) ? 'users' : 'plans';
+  if (!route && location.hash !== `#/${section}`) history.replaceState(null, '', `#/${section}`);
   try {
     if (!session.email) {
       const user = await call('/auth/v1/user', { token: await accessToken() });
       saveSession({ ...session, email: user.email ?? '' });
     }
-    const nodes = await (route ? userView(route[1]) : plansView());
+    const nodes = await (route ? userView(route[1]) : section === 'users' ? usersView() : plansView());
     if (id !== renderId) return;
     chrome_({ signedIn: true, admin: true });
     show(...nodes);
