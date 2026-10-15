@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Topic Feeds Admin</title>
+  <link rel="icon" href="icon.png">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="side">
+      <a class="brand" href="#/plans"><img src="icon.png" alt="" width="24" height="24"> Topic Feeds <span>Admin</span></a>
+      <nav id="nav" aria-label="Sections" hidden>
+        <a href="#/plans" data-section="plans">Plans &amp; access</a>
+      </nav>
+      <div class="me" id="me" hidden>
+        <span id="me-email"></span>
+        <button type="button" class="link" id="sign-out">Sign out</button>
+      </div>
+    </aside>
+    <main id="main" tabindex="-1">
+      <p class="muted">Loading…</p>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="admin.js"></script>
+</body>
+</html>
